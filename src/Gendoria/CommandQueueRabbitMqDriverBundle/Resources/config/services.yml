@@ -1,0 +1,30 @@
+services:
+    gendoria_command_queue_rabbit_mq_driver.send_driver:
+        class: Gendoria\CommandQueueRabbitMqDriverBundle\SendDriver\RabbitMqSendDriver
+        arguments: ['@jms_serializer', '@rabbitmq_producer']
+
+    gendoria_command_queue_rabbit_mq_driver.services_reschedule_worker:
+        class: Gendoria\CommandQueueRabbitMqDriverBundle\Worker\ServiceRescheduleWorker
+
+    gendoria_command_queue_rabbit_mq_driver.external_data_worker:
+        class: Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorker
+        arguments:
+            - '@event_dispatcher'
+            - '@isobar_command_queue.processor_factory'
+            - '@jms_serializer'
+            - '@reschedule_rabbitmq_producer'
+            - '@?logger'
+    
+    gendoria_command_queue_rabbit_mq_driver.listener.clear_logs:
+        class: Gendoria\CommandQueueRabbitMqDriverBundle\Listener\ClearLogsListener
+        arguments:
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }
+            
+    gendoria_command_queue_rabbit_mq_driver.listener.clear_entity_managers:
+        class: Gendoria\CommandQueueRabbitMqDriverBundle\Listener\ClearEntityManagersListener
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_subscriber }            
