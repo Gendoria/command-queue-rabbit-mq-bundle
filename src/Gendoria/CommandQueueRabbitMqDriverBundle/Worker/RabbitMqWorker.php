@@ -135,7 +135,7 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
 
         if ($retry) {
             $this->rescheduleProducer->publish(
-                $msg->body, $msg->delivery_info['routing_key'], array_merge(
+                $msg->body, (string)$msg->delivery_info['routing_key'], array_merge(
                     $msg->get_properties(), array('expiration' => $resheduleInS * 1000)
                 )
             );
