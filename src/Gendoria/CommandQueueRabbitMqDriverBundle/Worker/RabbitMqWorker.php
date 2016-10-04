@@ -85,8 +85,6 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
         } catch (TranslateErrorException $e) {
             $this->maybeReschedule($msg, $e);
             return self::MSG_REJECT;
-        } catch (Exception $e) {
-            return self::MSG_REJECT;
         }
     }
 
