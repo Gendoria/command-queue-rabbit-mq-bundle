@@ -5,7 +5,7 @@ namespace Gendoria\CommandQueueRabbitMqDriverBundle\SendDriver;
 use Gendoria\CommandQueue\Command\CommandInterface;
 use Gendoria\CommandQueue\SendDriver\SendDriverInterface;
 use JMS\Serializer\Serializer;
-use OldSound\RabbitMqBundle\RabbitMq\Producer;
+use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 
 /**
  * Command queue send driver using RabbitMQ server.
@@ -24,20 +24,18 @@ class RabbitMqSendDriver implements SendDriverInterface
     /**
      * Producer instance.
      *
-     * @var Producer
+     * @var ProducerInterface
      */
     private $producer;
 
     /**
      * Class constructor.
      *
-     * @param Serializer $serializer
-     * @param Producer   $producer
+     * @param Serializer        $serializer
+     * @param ProducerInterface $producer
      */
-    public function __construct(
-        Serializer $serializer,
-        Producer $producer
-    ) {
+    public function __construct(Serializer $serializer, ProducerInterface $producer)
+    {
         $this->serializer = $serializer;
         $this->producer = $producer;
     }
