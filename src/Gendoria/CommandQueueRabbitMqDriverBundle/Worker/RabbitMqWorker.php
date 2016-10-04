@@ -86,6 +86,7 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
             $this->maybeReschedule($msg, $e);
             return self::MSG_REJECT;
         }
+        return self::MSG_ACK;
     }
 
     protected function translateCommand($commandData)
