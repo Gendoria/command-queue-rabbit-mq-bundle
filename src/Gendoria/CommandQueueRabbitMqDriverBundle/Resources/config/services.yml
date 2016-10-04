@@ -10,7 +10,7 @@ services:
         class: Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorker
         arguments:
             - '@event_dispatcher'
-            - '@isobar_command_queue.processor_factory'
+            - '@gendoria_command_queue.processor_factory'
             - '@jms_serializer'
             - '@reschedule_rabbitmq_producer'
             - '@?logger'

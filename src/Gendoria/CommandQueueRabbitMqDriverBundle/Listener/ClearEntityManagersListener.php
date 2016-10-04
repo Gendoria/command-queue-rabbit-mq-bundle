@@ -4,8 +4,8 @@ namespace Gendoria\CommandQueueRabbitMqDriverBundle\Listener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Isobar\Bundle\CommandQueueBundle\Event\QueueEvents;
-use Isobar\Bundle\CommandQueueBundle\Event\QueueWorkerRunEvent;
+use Gendoria\CommandQueueBundle\Event\QueueEvents;
+use Gendoria\CommandQueueBundle\Event\QueueWorkerRunEvent;
 use Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorker;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -41,8 +41,8 @@ class ClearEntityManagersListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            QueueEvents::WORKER_RUN_BEFORE => 'beforeQueueRun',
-            QueueEvents::WORKER_RUN_AFTER => 'afterQueueRun',
+            QueueEvents::WORKER_RUN_BEFORE_TRANSLATE => 'beforeQueueRun',
+            QueueEvents::WORKER_RUN_AFTER_PROCESS => 'afterQueueRun',
         );
     }
 

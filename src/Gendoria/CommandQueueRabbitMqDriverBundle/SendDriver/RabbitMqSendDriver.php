@@ -2,8 +2,8 @@
 
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\SendDriver;
 
-use Isobar\CommandQueue\SendDriver\SendDriverInterface;
-use Isobar\CommandQueue\Command\CommandInterface;
+use Gendoria\CommandQueue\Command\CommandInterface;
+use Gendoria\CommandQueue\SendDriver\SendDriverInterface;
 use JMS\Serializer\Serializer;
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
 
