@@ -203,48 +203,6 @@ class RabbitMqWorkerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(ConsumerInterface::MSG_REJECT, $worker->execute($msg));
     }    
     
-    public function testTranslateErrorNoRepublish()
-    {
-        $command = $this->getCommand();
-        $processorFactory = $this->getProcessorFactory();
-        $serializer = $this->getSerializer();
-        $eventDispatcher = $this->getEventDispatcher();
-        $rescheduleProducer = $this->getRescheduleProducer();
-
-        $msg = new AMQPMessage("Test", array(
-            'application_headers' => new AMQPTable(
-                array(
-                    'x-death' => array(array('count' => 10)),
-                )
-            ),
-        ));
-        $msg->delivery_info = array(
-            'channel' => null,
-            'consumer_tag' => 't',
-            'delivery_tag' => 't',
-            'redelivered' => true,
-            'exchange' => 't',
-            'routing_key' => 't'
-        );
-
-        $eventDispatcher->expects($this->exactly(1))
-            ->method('dispatch')
-            ->withConsecutive(
-                array($this->equalTo(QueueEvents::WORKER_RUN_BEFORE_TRANSLATE))
-            );
-
-        $serializer->expects($this->never())->method('deserialize')
-            ->with("Test", get_class($command), 'json')
-            ->will($this->returnValue($command));
-        $rescheduleProducer
-            ->expects($this->never())
-            ->method('publish');
-
-        $worker = new RabbitMqWorker($eventDispatcher, $processorFactory, $serializer, $rescheduleProducer);
-
-        $this->assertEquals(ConsumerInterface::MSG_REJECT, $worker->execute($msg));
-    }
-    
     public function testGetProcessorError()
     {
         $command = $this->getCommand();
@@ -356,8 +314,92 @@ class RabbitMqWorkerTest extends PHPUnit_Framework_TestCase
         $worker = new RabbitMqWorker($eventDispatcher, $processorFactory, $serializer, $rescheduleProducer);
 
         $this->assertEquals(ConsumerInterface::MSG_REJECT, $worker->execute($msg));
+    }
+    
+    public function testErrorNoRepublish1()
+    {
+        $command = $this->getCommand();
+        $processorFactory = $this->getProcessorFactory();
+        $serializer = $this->getSerializer();
+        $eventDispatcher = $this->getEventDispatcher();
+        $rescheduleProducer = $this->getRescheduleProducer();
+
+        $msg = new AMQPMessage("Test", array(
+            'application_headers' => new AMQPTable(
+                array(
+                    'x-death' => array(array('count' => 10)),
+                )
+            ),
+        ));
+        $msg->delivery_info = array(
+            'channel' => null,
+            'consumer_tag' => 't',
+            'delivery_tag' => 't',
+            'redelivered' => true,
+            'exchange' => 't',
+            'routing_key' => 't'
+        );
+
+        $eventDispatcher->expects($this->exactly(1))
+            ->method('dispatch')
+            ->withConsecutive(
+                array($this->equalTo(QueueEvents::WORKER_RUN_BEFORE_TRANSLATE))
+            );
+
+        $serializer->expects($this->never())->method('deserialize')
+            ->with("Test", get_class($command), 'json')
+            ->will($this->returnValue($command));
+        $rescheduleProducer
+            ->expects($this->never())
+            ->method('publish');
+
+        $worker = new RabbitMqWorker($eventDispatcher, $processorFactory, $serializer, $rescheduleProducer);
+
+        $this->assertEquals(ConsumerInterface::MSG_REJECT, $worker->execute($msg));
     }    
 
+    public function testErrorNoRepublish2()
+    {
+        $command = $this->getCommand();
+        $processorFactory = $this->getProcessorFactory();
+        $serializer = $this->getSerializer();
+        $eventDispatcher = $this->getEventDispatcher();
+        $rescheduleProducer = $this->getRescheduleProducer();
+
+        $msg = new AMQPMessage("Test", array(
+            'application_headers' => new AMQPTable(
+                array(
+                    'x-death' => array_fill(0, 10, "ttt"),
+                )
+            ),
+        ));
+        $msg->delivery_info = array(
+            'channel' => null,
+            'consumer_tag' => 't',
+            'delivery_tag' => 't',
+            'redelivered' => true,
+            'exchange' => 't',
+            'routing_key' => 't'
+        );
+
+        $eventDispatcher->expects($this->exactly(1))
+            ->method('dispatch')
+            ->withConsecutive(
+                array($this->equalTo(QueueEvents::WORKER_RUN_BEFORE_TRANSLATE))
+            );
+
+        $serializer->expects($this->never())->method('deserialize')
+            ->with("Test", get_class($command), 'json')
+            ->will($this->returnValue($command));
+        $rescheduleProducer
+            ->expects($this->never())
+            ->method('publish');
+
+        $worker = new RabbitMqWorker($eventDispatcher, $processorFactory, $serializer, $rescheduleProducer);
+
+        $this->assertEquals(ConsumerInterface::MSG_REJECT, $worker->execute($msg));
+    }
+    
     /**
      * 
      * @return $processorFactory PHPUnit_Framework_MockObject_MockObject|PHPUnit_Framework_MockObject_Generator|ProcessorFactoryInterface
