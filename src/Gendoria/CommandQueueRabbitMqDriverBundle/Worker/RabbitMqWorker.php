@@ -3,6 +3,7 @@
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\Worker;
 
 use Exception;
+use Gendoria\CommandQueue\Command\CommandInterface;
 use Gendoria\CommandQueue\CommandProcessor\CommandProcessorInterface;
 use Gendoria\CommandQueue\ProcessorFactoryInterface;
 use Gendoria\CommandQueue\ProcessorNotFoundException;
@@ -96,9 +97,14 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
         if (empty($headers['x-class-name'])) {
             throw new InvalidArgumentException("Class name header 'x-class-name' not found");
         }
-        return $this->serializer->deserialize(
-                $commandData->body, $headers['x-class-name'], 'json'
-        );
+        $command = $this->serializer->deserialize($commandData->body, $headers['x-class-name'], 'json');
+        if (!is_object($command)) {
+            throw new InvalidArgumentException("Translated command should be an object.");
+        }
+        if (!$command instanceof CommandInterface) {
+            throw new InvalidArgumentException("Translated command should implement interface CommandInterface.");
+        }
+        return $command;
     }
 
     public function getSubsystemName()

@@ -17,7 +17,7 @@ class GendoriaCommandQueueRabbitMqDriverBundle extends Bundle
      */
     public function getContainerExtension()
     {
-        if (null === $this->extension) {
+        if (null === $this->extension || false === $this->extension) {
             $this->extension = new GendoriaCommandQueueRabbitMqDriverExtension();
         }
 
