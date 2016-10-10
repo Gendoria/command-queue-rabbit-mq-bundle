@@ -1,7 +1,7 @@
 services:
     gendoria_command_queue_rabbit_mq_driver.send_driver:
         class: Gendoria\CommandQueueRabbitMqDriverBundle\SendDriver\RabbitMqSendDriver
-        arguments: ['@jms_serializer', '@rabbitmq_producer']
+        arguments: ['%command_queue_serializer%', '@rabbitmq_producer']
 
     gendoria_command_queue_rabbit_mq_driver.services_reschedule_worker:
         class: Gendoria\CommandQueueRabbitMqDriverBundle\Worker\ServiceRescheduleWorker
@@ -11,7 +11,7 @@ services:
         arguments:
             - '@event_dispatcher'
             - '@gendoria_command_queue.processor_factory'
-            - '@jms_serializer'
+            - '%command_queue_serializer%'
             - '@reschedule_rabbitmq_producer'
             - '@?logger'
     

@@ -4,7 +4,9 @@ namespace Gendoria\CommandQueueRabbitMqDriverBundle\Listener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Gendoria\CommandQueueBundle\Event\QueueBeforeTranslateEvent;
 use Gendoria\CommandQueueBundle\Event\QueueEvents;
+use Gendoria\CommandQueueBundle\Event\QueueProcessEvent;
 use Gendoria\CommandQueueBundle\Event\QueueWorkerRunEvent;
 use Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorker;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -51,7 +53,7 @@ class ClearEntityManagersListener implements EventSubscriberInterface
      * 
      * @param QueueWorkerRunEvent $e
      */
-    public function beforeQueueRun(QueueWorkerRunEvent $e)
+    public function beforeQueueRun(QueueBeforeTranslateEvent $e)
     {
         if ($e->getSubsystem() !== RabbitMqWorker::SUBSYSTEM_NAME) {
             return;
@@ -64,7 +66,7 @@ class ClearEntityManagersListener implements EventSubscriberInterface
      * 
      * @param QueueWorkerRunEvent $e
      */
-    public function afterQueueRun(QueueWorkerRunEvent $e)
+    public function afterQueueRun(QueueProcessEvent $e)
     {
         if ($e->getSubsystem() !== RabbitMqWorker::SUBSYSTEM_NAME) {
             return;

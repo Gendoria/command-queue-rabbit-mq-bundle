@@ -7,6 +7,7 @@ use Gendoria\CommandQueue\CommandProcessor\CommandProcessorInterface;
 use Gendoria\CommandQueue\ProcessorFactoryInterface;
 use Gendoria\CommandQueue\ProcessorNotFoundException;
 use Gendoria\CommandQueue\Serializer\SerializedCommandData;
+use Gendoria\CommandQueue\Serializer\SerializerInterface;
 use Gendoria\CommandQueue\Worker\Exception\ProcessorErrorException;
 use Gendoria\CommandQueue\Worker\Exception\TranslateErrorException;
 use Gendoria\CommandQueueBundle\Serializer\JmsSerializer;
@@ -31,7 +32,7 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
      * 
      * @var string
      */
-    const SUBSYSTEM_NAME = "RabbitMqworker";
+    const SUBSYSTEM_NAME = "RabbitMqWorker";
 
     /**
      * Reschedule producer instance.
@@ -45,14 +46,13 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
      *
      * @param EventDispatcherInterface $eventDispatcher    Symfony event dispatcher.
      * @param ProcessorFactoryInterface         $processorFactory
-     * @param Serializer               $serializer
+     * @param SerializerInterface               $serializer
      * @param ProducerInterface                 $rescheduleProducer
      * @param LoggerInterface          $logger             Logger instance.
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher, ProcessorFactoryInterface $processorFactory, Serializer $serializer, ProducerInterface $rescheduleProducer, LoggerInterface $logger = null)
+    public function __construct(EventDispatcherInterface $eventDispatcher, ProcessorFactoryInterface $processorFactory, SerializerInterface $serializer, ProducerInterface $rescheduleProducer, LoggerInterface $logger = null)
     {
-        $jmsSerializer = new JmsSerializer($serializer);
-        parent::__construct($processorFactory, $jmsSerializer, $eventDispatcher, $logger);
+        parent::__construct($processorFactory, $serializer, $eventDispatcher, $logger);
 
         $this->rescheduleProducer = $rescheduleProducer;
     }

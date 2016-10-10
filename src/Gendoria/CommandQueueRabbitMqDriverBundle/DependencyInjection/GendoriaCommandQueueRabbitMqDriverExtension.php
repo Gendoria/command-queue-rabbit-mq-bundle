@@ -40,23 +40,28 @@ class GendoriaCommandQueueRabbitMqDriverExtension extends Extension implements P
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
+        $this->loadDrivers($config, $container);
+        $container->removeDefinition('gendoria_command_queue_rabbit_mq_driver.send_driver');
+        $container->removeDefinition('gendoria_command_queue_rabbit_mq_driver.external_data_worker');
+    }
+    
+    private function loadDrivers(array $config, ContainerBuilder $container)
+    {
+        $serializer = substr($config['serializer'], 1);
         foreach ($config['drivers'] as $driverId => $driver) {
+            $producerName = sprintf('old_sound_rabbit_mq.%s_producer', $driver['producer_name']);
+            $delayedProducerName = sprintf('old_sound_rabbit_mq.%s_reschedule_delayed_producer', $driver['producer_name']);
+            
             $newDriver = clone $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.send_driver');
-            $newDriver->replaceArgument(
-                1,
-                new Reference(sprintf('old_sound_rabbit_mq.%s_producer', $driver['producer_name']))
-            );
+            $newDriver->replaceArgument(0, new Reference($serializer));
+            $newDriver->replaceArgument(1, new Reference($producerName));
             $container->setDefinition('gendoria_command_queue_rabbit_mq_driver.driver.'.$driverId, $newDriver);
 
             $newWorker = clone $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.external_data_worker');
-            $newWorker->replaceArgument(
-                3,
-                new Reference(sprintf('old_sound_rabbit_mq.%s_producer', $driver['producer_name'].'_reschedule_delayed'))
-            );
+            $newWorker->replaceArgument(2, new Reference($serializer));
+            $newWorker->replaceArgument(3, new Reference($delayedProducerName));
             $container->setDefinition('gendoria_command_queue_rabbit_mq_driver.worker.'.$driverId, $newWorker);
         }
-        $container->removeDefinition('gendoria_command_queue_rabbit_mq_driver.send_driver');
-        $container->removeDefinition('gendoria_command_queue_rabbit_mq_driver.external_data_worker');
     }
 
     /**

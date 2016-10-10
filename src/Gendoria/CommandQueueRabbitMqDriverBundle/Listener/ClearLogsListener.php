@@ -2,7 +2,9 @@
 
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\Listener;
 
+use Gendoria\CommandQueueBundle\Event\QueueBeforeTranslateEvent;
 use Gendoria\CommandQueueBundle\Event\QueueEvents;
+use Gendoria\CommandQueueBundle\Event\QueueProcessEvent;
 use Gendoria\CommandQueueBundle\Event\QueueWorkerRunEvent;
 use Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorker;
 use Monolog\Handler\FingersCrossedHandler;
@@ -50,7 +52,7 @@ class ClearLogsListener implements EventSubscriberInterface
      * 
      * @param QueueWorkerRunEvent $e
      */
-    public function beforeQueueRun(QueueWorkerRunEvent $e)
+    public function beforeQueueRun(QueueBeforeTranslateEvent $e)
     {
         if ($e->getSubsystem() !== RabbitMqWorker::SUBSYSTEM_NAME) {
             return;
@@ -63,7 +65,7 @@ class ClearLogsListener implements EventSubscriberInterface
      * 
      * @param QueueWorkerRunEvent $e
      */
-    public function afterQueueRun(QueueWorkerRunEvent $e)
+    public function afterQueueRun(QueueProcessEvent $e)
     {
         if ($e->getSubsystem() !== RabbitMqWorker::SUBSYSTEM_NAME) {
             return;

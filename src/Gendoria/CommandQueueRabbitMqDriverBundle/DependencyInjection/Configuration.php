@@ -41,6 +41,16 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root($this->alias);
         $rootNode->children()
+            ->scalarNode('serializer')
+                ->cannotBeEmpty()
+                ->isRequired()
+                ->validate()
+                    ->ifTrue(function($v) {
+                        return strpos($v, '@') !== 0;
+                    })
+                    ->thenInvalid('Serializer has to be in form "@service.id"')
+                ->end()
+            ->end()
             ->arrayNode('drivers')
                 ->prototype('array')
                     ->children()
