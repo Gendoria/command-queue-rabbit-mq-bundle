@@ -13,7 +13,6 @@ use Gendoria\CommandQueue\Worker\Exception\TranslateErrorException;
 use Gendoria\CommandQueueBundle\Event\QueueEvents;
 use Gendoria\CommandQueueBundle\Event\QueueProcessErrorEvent;
 use Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorker;
-use JMS\Serializer\Serializer;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -390,7 +389,7 @@ class RabbitMqWorkerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return PHPUnit_Framework_MockObject_Generator|PHPUnit_Framework_MockObject_MockObject|Serializer
+     * @return PHPUnit_Framework_MockObject_Generator|PHPUnit_Framework_MockObject_MockObject|SerializerInterface
      */
     private function getSerializer()
     {
