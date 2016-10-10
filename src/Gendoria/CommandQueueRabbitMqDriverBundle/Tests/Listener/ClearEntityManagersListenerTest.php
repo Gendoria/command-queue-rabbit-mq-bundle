@@ -3,6 +3,7 @@
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\Tests\Listener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Gendoria\CommandQueue\Command\CommandInterface;
@@ -56,7 +57,12 @@ class ClearEntityManagersListenerTest extends PHPUnit_Framework_TestCase
             $managerRegistry->expects($this->once())
                 ->method('getManagers')
                 ->will($this->returnValue($managers));
+            $cnt = 0;
             foreach ($managers as $manager) {
+                if (!$manager instanceof EntityManager) {
+                    continue;
+                }
+                $cnt++;
                 $manager->expects($this->once())
                     ->method('clear')
                     ;
@@ -65,10 +71,10 @@ class ClearEntityManagersListenerTest extends PHPUnit_Framework_TestCase
                     ->will($this->returnValue($connection));
                 $manager->expects($this->once())->method('close');
             }
-            $connection->expects($this->exactly(count($managers)))
+            $connection->expects($this->exactly($cnt))
                 ->method('ping')
                 ->will($this->returnValue(false));
-            $connection->expects($this->exactly(count($managers)))
+            $connection->expects($this->exactly($cnt))
                 ->method('close');
         } else {
             $managerRegistry->expects($this->never())
@@ -85,11 +91,11 @@ class ClearEntityManagersListenerTest extends PHPUnit_Framework_TestCase
         $processor = $this->getMockBuilder(CommandProcessorInterface::class)->getMock();
         return array(
             array(new QueueBeforeTranslateEvent($worker, "ttt", RabbitMqWorker::SUBSYSTEM_NAME), "beforeQueueRun", $this->getEventDataCreateManagers(0), true),
-            array(new QueueBeforeTranslateEvent($worker, "ttt", RabbitMqWorker::SUBSYSTEM_NAME), "beforeQueueRun", $this->getEventDataCreateManagers(2), true),
+            array(new QueueBeforeTranslateEvent($worker, "ttt", RabbitMqWorker::SUBSYSTEM_NAME), "beforeQueueRun", $this->getEventDataCreateManagers(4), true),
             array(new QueueBeforeTranslateEvent($worker, "ttt", "dummySubsystem"), "beforeQueueRun", $this->getEventDataCreateManagers(), false),
             
             array(new QueueProcessEvent($worker, $command, $processor, RabbitMqWorker::SUBSYSTEM_NAME), "afterQueueRun", $this->getEventDataCreateManagers(0), true),
-            array(new QueueProcessEvent($worker, $command, $processor, RabbitMqWorker::SUBSYSTEM_NAME), "afterQueueRun", $this->getEventDataCreateManagers(2), true),
+            array(new QueueProcessEvent($worker, $command, $processor, RabbitMqWorker::SUBSYSTEM_NAME), "afterQueueRun", $this->getEventDataCreateManagers(4), true),
             array(new QueueProcessEvent($worker, $command, $processor, "dummySubsystem"), "afterQueueRun", $this->getEventDataCreateManagers(), false),
         );
     }
@@ -98,9 +104,15 @@ class ClearEntityManagersListenerTest extends PHPUnit_Framework_TestCase
     {
         $return = array();
         for ($k=0; $k < $count; $k++) {
-            $return[] = $this->getMockBuilder(EntityManager::class)
-                ->disableOriginalConstructor()
-                ->getMock();
+            if ($k % 3 === 0) {
+                $return[] = $this->getMockBuilder(ObjectManager::class)
+                    ->disableOriginalConstructor()
+                    ->getMock();
+            } else {
+                $return[] = $this->getMockBuilder(EntityManager::class)
+                    ->disableOriginalConstructor()
+                    ->getMock();
+            }
         }
         return $return;
     }

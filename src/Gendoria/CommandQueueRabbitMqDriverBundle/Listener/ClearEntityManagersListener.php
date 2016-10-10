@@ -80,6 +80,9 @@ class ClearEntityManagersListener implements EventSubscriberInterface
     private function clearEntityManagers()
     {
         foreach ($this->managerRegistry->getManagers() as /* @var $manager EntityManager */ $manager) {
+            if (!$manager instanceof EntityManager) {
+                continue;
+            }
             $manager->clear();
             if (!$manager->getConnection()->ping()) {
                 $manager->getConnection()->close();
