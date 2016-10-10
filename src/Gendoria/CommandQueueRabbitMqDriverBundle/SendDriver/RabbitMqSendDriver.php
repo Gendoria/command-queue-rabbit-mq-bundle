@@ -4,6 +4,7 @@ namespace Gendoria\CommandQueueRabbitMqDriverBundle\SendDriver;
 
 use Gendoria\CommandQueue\Command\CommandInterface;
 use Gendoria\CommandQueue\SendDriver\SendDriverInterface;
+use Gendoria\CommandQueue\Serializer\SerializerInterface;
 use JMS\Serializer\Serializer;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 
@@ -17,7 +18,7 @@ class RabbitMqSendDriver implements SendDriverInterface
     /**
      * Serializer instance.
      *
-     * @var Serializer
+     * @var SerializerInterface
      */
     private $serializer;
 
@@ -34,7 +35,7 @@ class RabbitMqSendDriver implements SendDriverInterface
      * @param Serializer        $serializer
      * @param ProducerInterface $producer
      */
-    public function __construct(Serializer $serializer, ProducerInterface $producer)
+    public function __construct(SerializerInterface $serializer, ProducerInterface $producer)
     {
         $this->serializer = $serializer;
         $this->producer = $producer;
@@ -47,9 +48,10 @@ class RabbitMqSendDriver implements SendDriverInterface
      */
     public function send(CommandInterface $command)
     {
+        $serialized = $this->serializer->serialize($command);
         $this->producer->publish(
-            $this->serializer->serialize($command, 'json'),
-            get_class($command),
+            $serialized->getSerializedCommand(),
+            $serialized->getCommandClass(),
             array(
                 'application_headers' => array(
                     'x-class-name' => array(
