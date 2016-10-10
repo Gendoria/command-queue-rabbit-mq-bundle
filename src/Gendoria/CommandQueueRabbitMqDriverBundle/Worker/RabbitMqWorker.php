@@ -3,14 +3,14 @@
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\Worker;
 
 use Exception;
-use Gendoria\CommandQueue\Command\CommandInterface;
 use Gendoria\CommandQueue\CommandProcessor\CommandProcessorInterface;
 use Gendoria\CommandQueue\ProcessorFactoryInterface;
 use Gendoria\CommandQueue\ProcessorNotFoundException;
+use Gendoria\CommandQueue\Serializer\SerializedCommandData;
 use Gendoria\CommandQueue\Worker\Exception\ProcessorErrorException;
 use Gendoria\CommandQueue\Worker\Exception\TranslateErrorException;
+use Gendoria\CommandQueueBundle\Serializer\JmsSerializer;
 use Gendoria\CommandQueueBundle\Worker\BaseSymfonyWorker;
-use InvalidArgumentException;
 use JMS\Serializer\Serializer;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
@@ -34,13 +34,6 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
     const SUBSYSTEM_NAME = "RabbitMqworker";
 
     /**
-     * Serializer instance.
-     *
-     * @var Serializer
-     */
-    private $serializer;
-
-    /**
      * Reschedule producer instance.
      *
      * @var ProducerInterface
@@ -58,9 +51,9 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
      */
     public function __construct(EventDispatcherInterface $eventDispatcher, ProcessorFactoryInterface $processorFactory, Serializer $serializer, ProducerInterface $rescheduleProducer, LoggerInterface $logger = null)
     {
-        parent::__construct($processorFactory, $eventDispatcher, $logger);
+        $jmsSerializer = new JmsSerializer($serializer);
+        parent::__construct($processorFactory, $jmsSerializer, $eventDispatcher, $logger);
 
-        $this->serializer = $serializer;
         $this->rescheduleProducer = $rescheduleProducer;
     }
 
@@ -89,22 +82,19 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
         return self::MSG_ACK;
     }
 
-    protected function translateCommand($commandData)
+    /**
+     * @param AMQPMessage $commandData
+     * {@inheritdoc}
+     */
+    protected function getSerializedCommandData($commandData)
     {
         /* @var $commandData AMQPMessage */
         $headers = $commandData->get('application_headers')->getNativeData();
         if (empty($headers['x-class-name'])) {
-            throw new InvalidArgumentException("Class name header 'x-class-name' not found");
+            throw new TranslateErrorException($commandData, "Class name header 'x-class-name' not found");
         }
-        $command = $this->serializer->deserialize($commandData->body, $headers['x-class-name'], 'json');
-        if (!is_object($command)) {
-            throw new InvalidArgumentException("Translated command should be an object.");
-        }
-        if (!$command instanceof CommandInterface) {
-            throw new InvalidArgumentException("Translated command should implement interface CommandInterface.");
-        }
-        return $command;
-    }
+        return new SerializedCommandData($commandData->body, $headers['x-class-name']);
+    }    
 
     public function getSubsystemName()
     {
@@ -160,5 +150,4 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
         }
         return $retryCount;
     }
-
 }
