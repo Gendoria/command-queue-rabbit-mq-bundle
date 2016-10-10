@@ -20,7 +20,7 @@
 		<whitelist processUncoveredFilesFromWhitelist="true">
 			<directory suffix=".php">src/*</directory>
             <exclude>
-                <directory>./src/Gendoria/CommandQueueRabbitMqDriverBundle/Tests/*</directory>
+                <directory>./src/Gendoria/CommandQueueRabbitMqDriverBundle/Tests</directory>
             </exclude>            
 		</whitelist>
 	</filter>
