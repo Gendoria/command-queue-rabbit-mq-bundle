@@ -55,7 +55,7 @@ class RabbitMqSendDriver implements SendDriverInterface
                 'application_headers' => array(
                     'x-class-name' => array(
                         'S',
-                        get_class($command),
+                        $serialized->getCommandClass(),
                     ),
                 ),
             )
