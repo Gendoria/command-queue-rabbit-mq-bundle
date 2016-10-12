@@ -25,11 +25,11 @@
         "symfony/monolog-bundle": "~2.4",        
         "gendoria/command-queue": "dev-master",
         "gendoria/command-queue-bundle": "dev-master",
-        "php-amqplib/rabbitmq-bundle": "~1.6",
-        "jms/serializer": "dev-master"
+        "php-amqplib/rabbitmq-bundle": "~1.6"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": ">=2.7.0"
+        "symfony/phpunit-bridge": ">=2.7.0",
+        "jms/serializer": "dev-master"
     },
     "suggest": {
     },
