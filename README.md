@@ -126,8 +126,8 @@ gendoria_command_queue:
 
 This step is done by `php-amqplib/rabbitmq-bundle` command.
 
-```
-app/console rabbitmq:setup-fabric
+```console
+$ app/console rabbitmq:setup-fabric
 ```
 
 It is optional, if you start your consumers before starting sending commands to queue.
