@@ -6,7 +6,7 @@
 [![Downloads](https://img.shields.io/packagist/dt/gendoria/command-queue-rabbitmq-bundle.svg)](https://packagist.org/packages/gendoria/command-queue-rabbitmq-bundle)
 [![Latest Stable Version](https://img.shields.io/packagist/v/gendoria/command-queue-rabbitmq-bundle.svg)](https://packagist.org/packages/gendoria/command-queue-rabbitmq-bundle)
 
-RabbitMQ driver bundle for [Gendoria Command Queue Bundle](https://github.com/Gendoria/command-queue-bundle).
+RabbitMQ driver bundle for [`gendoria/command-queue-bundle`](https://github.com/Gendoria/command-queue-bundle).
 
 Bundle created in cooperation with [Isobar Poland](http://www.isobar.com/pl/).
 
