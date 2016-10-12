@@ -4,8 +4,8 @@ namespace Gendoria\CommandQueueRabbitMqDriverBundle\Worker;
 
 use Exception;
 use Gendoria\CommandQueue\CommandProcessor\CommandProcessorInterface;
-use Gendoria\CommandQueue\ProcessorFactoryInterface;
-use Gendoria\CommandQueue\ProcessorNotFoundException;
+use Gendoria\CommandQueue\ProcessorFactory\ProcessorFactoryInterface;
+use Gendoria\CommandQueue\ProcessorFactory\ProcessorNotFoundException;
 use Gendoria\CommandQueue\Serializer\SerializedCommandData;
 use Gendoria\CommandQueue\Serializer\SerializerInterface;
 use Gendoria\CommandQueue\Worker\Exception\ProcessorErrorException;
