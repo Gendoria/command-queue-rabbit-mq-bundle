@@ -25,12 +25,12 @@ class RabbitMqSendDriverTest extends PHPUnit_Framework_TestCase
         $serializer->expects($this->once())
             ->method('serialize')
             ->with($command)
-            ->will($this->returnValue(new SerializedCommandData('a', 'b')));
+            ->will($this->returnValue(new SerializedCommandData('test', get_class($command))));
         
         $producer->expects($this->once())
             ->method('publish')
-            ->with('a',
-                'b',
+            ->with('test',
+                get_class($command),
                 array(
                 'application_headers' => array(
                     'x-class-name' => array(
