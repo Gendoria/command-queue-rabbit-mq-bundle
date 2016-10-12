@@ -20,6 +20,9 @@ Bundle created in cooperation with [Isobar Poland](http://www.isobar.com/pl/).
 [`gendoria/command-queue-bundle`](https://github.com/Gendoria/command-queue-bundle) and 
 [`php-amqplib/rabbitmq-bundle`](https://github.com/php-amqplib/RabbitMqBundle).
 
+For RabbitMQ Bundle you are required to configure only the 'connections' section.
+All required producers and consumers are created automatically by this bundle.
+
 ### Step 1: Download the Bundle
 
 
