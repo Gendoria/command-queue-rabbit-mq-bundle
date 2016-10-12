@@ -143,3 +143,5 @@ For the configuration from step 3, it will look like that:
 ```sh
 app/console rabbitmq:consumer -w poolname_command_queue_worker
 ```
+
+You should use services like [supervisord](http://supervisord.org/) to control running and restarting your workers.
