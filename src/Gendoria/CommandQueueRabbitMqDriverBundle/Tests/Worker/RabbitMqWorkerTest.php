@@ -7,9 +7,9 @@ use Gendoria\CommandQueue\Command\CommandInterface;
 use Gendoria\CommandQueue\CommandProcessor\CommandProcessorInterface;
 use Gendoria\CommandQueue\ProcessorFactory\Exception\ProcessorNotFoundException;
 use Gendoria\CommandQueue\ProcessorFactory\ProcessorFactoryInterface;
+use Gendoria\CommandQueue\Serializer\Exception\UnserializeErrorException;
 use Gendoria\CommandQueue\Serializer\SerializedCommandData;
 use Gendoria\CommandQueue\Serializer\SerializerInterface;
-use Gendoria\CommandQueue\Worker\Exception\TranslateErrorException;
 use Gendoria\CommandQueueBundle\Event\QueueEvents;
 use Gendoria\CommandQueueBundle\Event\QueueProcessErrorEvent;
 use Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorker;
@@ -151,7 +151,7 @@ class RabbitMqWorkerTest extends PHPUnit_Framework_TestCase
 
         $serializer->expects($this->once())->method('unserialize')
             ->with($this->equalTo(new SerializedCommandData("Test", get_class($command))))
-            ->will($this->throwException(new TranslateErrorException("Test")))
+            ->will($this->throwException(new UnserializeErrorException("Test")))
             ;
         $rescheduleProducer
             ->expects($this->once())

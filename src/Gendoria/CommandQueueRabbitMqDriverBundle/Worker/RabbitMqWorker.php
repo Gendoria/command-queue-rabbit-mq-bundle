@@ -6,10 +6,10 @@ use Exception;
 use Gendoria\CommandQueue\CommandProcessor\CommandProcessorInterface;
 use Gendoria\CommandQueue\ProcessorFactory\Exception\ProcessorNotFoundException;
 use Gendoria\CommandQueue\ProcessorFactory\ProcessorFactoryInterface;
+use Gendoria\CommandQueue\Serializer\Exception\UnserializeErrorException;
 use Gendoria\CommandQueue\Serializer\SerializedCommandData;
 use Gendoria\CommandQueue\Serializer\SerializerInterface;
 use Gendoria\CommandQueue\Worker\Exception\ProcessorErrorException;
-use Gendoria\CommandQueue\Worker\Exception\TranslateErrorException;
 use Gendoria\CommandQueueBundle\Worker\BaseSymfonyWorker;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
@@ -73,7 +73,7 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
         } catch (ProcessorNotFoundException $e) {
             $this->maybeReschedule($msg, $e);
             return self::MSG_REJECT;
-        } catch (TranslateErrorException $e) {
+        } catch (UnserializeErrorException $e) {
             $this->maybeReschedule($msg, $e);
             return self::MSG_REJECT;
         }
@@ -89,7 +89,7 @@ class RabbitMqWorker extends BaseSymfonyWorker implements ConsumerInterface
         /* @var $commandData AMQPMessage */
         $headers = $commandData->get('application_headers')->getNativeData();
         if (empty($headers['x-class-name'])) {
-            throw new TranslateErrorException($commandData, "Class name header 'x-class-name' not found");
+            throw new UnserializeErrorException($commandData, "Class name header 'x-class-name' not found");
         }
         return new SerializedCommandData($commandData->body, $headers['x-class-name']);
     }    
