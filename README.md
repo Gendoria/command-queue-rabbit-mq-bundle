@@ -12,11 +12,13 @@ Bundle created in cooperation with [Isobar Poland](http://www.isobar.com/pl/).
 
 ![Isobar Poland](doc/images/isobar.jpg "Isobar Poland logo") 
 
+## Installation
+
+### Step 0: Prerequisites
+
 :warning: Before using this bundle, you should install and configure 
 [`gendoria/command-queue-bundle`](https://github.com/Gendoria/command-queue-bundle) and 
 [`php-amqplib/rabbitmq-bundle`](https://github.com/php-amqplib/RabbitMqBundle).
-
-## Installation
 
 ### Step 1: Download the Bundle
 
