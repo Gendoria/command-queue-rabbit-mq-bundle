@@ -3,31 +3,22 @@
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\Tests\Worker;
 
 use Exception;
-use Gendoria\CommandQueue\Command\CommandInterface;
-use Gendoria\CommandQueue\CommandProcessor\CommandProcessorInterface;
 use Gendoria\CommandQueue\ProcessorFactory\Exception\ProcessorNotFoundException;
-use Gendoria\CommandQueue\ProcessorFactory\ProcessorFactoryInterface;
 use Gendoria\CommandQueue\Serializer\Exception\UnserializeErrorException;
 use Gendoria\CommandQueue\Serializer\SerializedCommandData;
-use Gendoria\CommandQueue\Serializer\SerializerInterface;
 use Gendoria\CommandQueueBundle\Event\QueueEvents;
 use Gendoria\CommandQueueBundle\Event\QueueProcessErrorEvent;
 use Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorker;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
-use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
-use PHPUnit_Framework_MockObject_Generator;
-use PHPUnit_Framework_MockObject_MockObject;
-use PHPUnit_Framework_TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Description of RabbitMqWorkerTest
  *
  * @author Tomasz Struczyński <t.struczynski@gmail.com>
  */
-class RabbitMqWorkerTest extends PHPUnit_Framework_TestCase
+class RabbitMqWorkerTest extends BaseTestClass
 {
     public function testCorrectPass()
     {
@@ -358,60 +349,4 @@ class RabbitMqWorkerTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(ConsumerInterface::MSG_REJECT, $worker->execute($msg));
     }
-    
-    /**
-     * 
-     * @return $processorFactory PHPUnit_Framework_MockObject_MockObject|PHPUnit_Framework_MockObject_Generator|ProcessorFactoryInterface
-     */
-    private function getProcessorFactory()
-    {
-        /* @var $processorFactory PHPUnit_Framework_MockObject_MockObject|PHPUnit_Framework_MockObject_Generator|ProcessorFactoryInterface */
-        $processorFactory = $this->getMockBuilder(ProcessorFactoryInterface::class)->getMock();
-        return $processorFactory;
-    }
-
-    /**
-     * 
-     * @return PHPUnit_Framework_MockObject_Generator|PHPUnit_Framework_MockObject_MockObject|CommandProcessorInterface
-     */
-    private function getProcessor()
-    {
-        return $this->getMockBuilder(CommandProcessorInterface::class)->getMock();
-    }
-
-    /**
-     * 
-     * @return PHPUnit_Framework_MockObject_Generator|PHPUnit_Framework_MockObject_MockObject|CommandInterface
-     */
-    private function getCommand()
-    {
-        return $this->getMockBuilder(CommandInterface::class)->getMock();
-    }
-
-    /**
-     * @return PHPUnit_Framework_MockObject_Generator|PHPUnit_Framework_MockObject_MockObject|SerializerInterface
-     */
-    private function getSerializer()
-    {
-        return $this->getMockBuilder(SerializerInterface::class)->disableOriginalConstructor()->getMock();
-    }
-
-    /**
-     * 
-     * @return PHPUnit_Framework_MockObject_Generator|PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface
-     */
-    private function getEventDispatcher()
-    {
-        return $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
-    }
-
-    /**
-     * 
-     * @return PHPUnit_Framework_MockObject_Generator|PHPUnit_Framework_MockObject_MockObject|ProducerInterface
-     */
-    private function getRescheduleProducer()
-    {
-        return $this->getMockBuilder(ProducerInterface::class)->getMock();
-    }
-
 }

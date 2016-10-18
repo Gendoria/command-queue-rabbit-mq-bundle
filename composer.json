@@ -18,9 +18,10 @@
     "require": {
         "php": ">=5.5.0",
         "psr/log": "~1.0",
-        "symfony/framework-bundle": ">=2.7.0",
-        "symfony/dependency-injection": ">=2.7.0",
-        "symfony/yaml": ">=2.7.0",
+        "symfony/framework-bundle": "~2.7|~3.0",
+        "symfony/dependency-injection": "~2.7|~3.0",
+        "symfony/console": "~2.7|~3.0",
+        "symfony/yaml": "~2.7|~3.0",
         "doctrine/orm": "~2.2,>=2.2.3",
         "symfony/monolog-bundle": "~2.4",        
         "gendoria/command-queue": "dev-master",

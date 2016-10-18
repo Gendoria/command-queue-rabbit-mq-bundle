@@ -2,6 +2,7 @@
 
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\DependencyInjection;
 
+use Gendoria\CommandQueueBundle\DependencyInjection\Pass\WorkerRunnersPass;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -48,6 +49,7 @@ class GendoriaCommandQueueRabbitMqDriverExtension extends Extension implements P
     private function loadDrivers(array $config, ContainerBuilder $container)
     {
         $serializer = substr($config['serializer'], 1);
+        $workerRunner = $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.worker_runner');
         foreach ($config['drivers'] as $driverId => $driver) {
             $producerName = sprintf('old_sound_rabbit_mq.%s_producer', $driver['producer_name']);
             $delayedProducerName = sprintf('old_sound_rabbit_mq.%s_reschedule_delayed_producer', $driver['producer_name']);
@@ -60,6 +62,7 @@ class GendoriaCommandQueueRabbitMqDriverExtension extends Extension implements P
             $newWorker = clone $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.external_data_worker');
             $newWorker->replaceArgument(2, new Reference($serializer));
             $newWorker->replaceArgument(3, new Reference($delayedProducerName));
+            $workerRunner->addTag(WorkerRunnersPass::WORKER_RUNNER_TAG, array('name' => $driverId, 'options' => $driver));
             $container->setDefinition('gendoria_command_queue_rabbit_mq_driver.worker.'.$driverId, $newWorker);
         }
     }

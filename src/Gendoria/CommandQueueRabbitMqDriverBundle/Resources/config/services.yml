@@ -14,6 +14,9 @@ services:
             - '%command_queue_serializer%'
             - '@reschedule_rabbitmq_producer'
             - '@?logger'
+            
+    gendoria_command_queue_rabbit_mq_driver.worker_runner:
+        class: Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorkerRunner
     
     gendoria_command_queue_rabbit_mq_driver.listener.clear_logs:
         class: Gendoria\CommandQueueRabbitMqDriverBundle\Listener\ClearLogsListener
@@ -27,4 +30,4 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: kernel.event_subscriber }            
+            - { name: kernel.event_subscriber }

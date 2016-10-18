@@ -2,6 +2,8 @@
 
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\Tests\DependencyInjection;
 
+use Gendoria\CommandQueueBundle\DependencyInjection\Pass\WorkerRunnersPass;
+use Gendoria\CommandQueueBundle\DependencyInjection\Pass\WorkersPass;
 use Gendoria\CommandQueueRabbitMqDriverBundle\DependencyInjection\GendoriaCommandQueueRabbitMqDriverExtension;
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -42,6 +44,10 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
         $defaultWorker = $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.worker.default');
         $this->assertEquals(new Reference('gendoria_command_queue.serializer.symfony'), $defaultWorker->getArgument(2));
         $this->assertEquals(new Reference('old_sound_rabbit_mq.default_reschedule_delayed_producer'), $defaultWorker->getArgument(3));
+        
+        $workerRunner = $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.worker_runner');
+        $this->assertTrue($workerRunner->hasTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
+        $this->assertEquals(array(array('name' => 'default', 'options' => $config['drivers']['default'])), $workerRunner->getTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
     }
 
     public function testPrepend()
