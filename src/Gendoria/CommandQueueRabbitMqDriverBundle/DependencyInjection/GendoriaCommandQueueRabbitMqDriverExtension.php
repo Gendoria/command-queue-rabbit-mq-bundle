@@ -62,7 +62,7 @@ class GendoriaCommandQueueRabbitMqDriverExtension extends Extension implements P
             $newWorker = clone $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.external_data_worker');
             $newWorker->replaceArgument(2, new Reference($serializer));
             $newWorker->replaceArgument(3, new Reference($delayedProducerName));
-            $workerRunner->addTag(WorkerRunnersPass::WORKER_RUNNER_TAG, array('name' => $driverId, 'options' => $driver));
+            $workerRunner->addTag(WorkerRunnersPass::WORKER_RUNNER_TAG, array('name' => $driverId, 'options' => json_encode($driver)));
             $container->setDefinition('gendoria_command_queue_rabbit_mq_driver.worker.'.$driverId, $newWorker);
         }
     }

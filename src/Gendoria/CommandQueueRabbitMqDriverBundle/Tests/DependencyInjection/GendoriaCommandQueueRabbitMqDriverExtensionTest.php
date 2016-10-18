@@ -47,7 +47,7 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
         
         $workerRunner = $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.worker_runner');
         $this->assertTrue($workerRunner->hasTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
-        $this->assertEquals(array(array('name' => 'default', 'options' => $config['drivers']['default'])), $workerRunner->getTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
+        $this->assertEquals(array(array('name' => 'default', 'options' => json_encode($config['drivers']['default']))), $workerRunner->getTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
     }
 
     public function testPrepend()
