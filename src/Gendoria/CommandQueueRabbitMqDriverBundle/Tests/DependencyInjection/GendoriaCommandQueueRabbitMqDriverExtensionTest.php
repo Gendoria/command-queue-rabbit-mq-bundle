@@ -49,11 +49,11 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
         $this->assertTrue($workerRunner->hasTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
         $expectedTags = array(
             array(
-                'name' => 'default',
+                'name' => 'rmq.default',
                 'options' => json_encode($config['drivers']['default'])
             ),
             array(
-                'name' => 'default_reschedule',
+                'name' => 'rmq.default.reschedule',
                 'options' => json_encode(array_merge($config['drivers']['default'], array('reschedule' => true)))
             ),
         );
