@@ -34,7 +34,7 @@ class RabbitMqWorkerRunner implements WorkerRunnerInterface
         $input = new ArrayInput(array(
             'command' => 'rabbitmq:consumer',
             '-w' => null,
-            'name' => $options['consumer_name'],
+            'name' => !empty($options['reschedule']) ? $options['consumer_name'].'_reschedule_delayed' : $options['consumer_name'],
         ));
         $application->run($input, $output);
     }

@@ -44,10 +44,20 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
         $defaultWorker = $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.worker.default');
         $this->assertEquals(new Reference('gendoria_command_queue.serializer.symfony'), $defaultWorker->getArgument(2));
         $this->assertEquals(new Reference('old_sound_rabbit_mq.default_reschedule_delayed_producer'), $defaultWorker->getArgument(3));
-        
+
         $workerRunner = $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.worker_runner');
         $this->assertTrue($workerRunner->hasTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
-        $this->assertEquals(array(array('name' => 'default', 'options' => json_encode($config['drivers']['default']))), $workerRunner->getTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
+        $expectedTags = array(
+            array(
+                'name' => 'default',
+                'options' => json_encode($config['drivers']['default'])
+            ),
+            array(
+                'name' => 'default_reschedule',
+                'options' => json_encode(array_merge($config['drivers']['default'], array('reschedule' => true)))
+            ),
+        );
+        $this->assertEquals($expectedTags, $workerRunner->getTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
         $this->assertTrue($container->has('gendoria_command_queue_rabbit_mq_driver.listener.clear_entity_managers'));
     }
 
@@ -132,7 +142,7 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
             ),
             ), $rabbitMqConfig[0]['producers']['default_reschedule_delayed']);
     }
-    
+
     public function testPrependNoDoctrine()
     {
         $container = new ContainerBuilder();
@@ -156,4 +166,5 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
         $extension->load($parsedConfig, $container);
         $this->assertFalse($container->has('gendoria_command_queue_rabbit_mq_driver.listener.clear_entity_managers'));
     }
+
 }
