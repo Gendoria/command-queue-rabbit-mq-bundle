@@ -44,6 +44,9 @@ class GendoriaCommandQueueRabbitMqDriverExtension extends Extension implements P
         $this->loadDrivers($config, $container);
         $container->removeDefinition('gendoria_command_queue_rabbit_mq_driver.send_driver');
         $container->removeDefinition('gendoria_command_queue_rabbit_mq_driver.external_data_worker');
+        if (!$config['clear_entity_managers_listener_enabled']) {
+            $container->removeDefinition('gendoria_command_queue_rabbit_mq_driver.listener.clear_entity_managers');
+        }
     }
     
     private function loadDrivers(array $config, ContainerBuilder $container)
@@ -68,12 +71,22 @@ class GendoriaCommandQueueRabbitMqDriverExtension extends Extension implements P
     }
 
     /**
-     * Prepend configuration to OldSoundRabbitMQBundle.
+     * Prepend configuration.
      *
      * @param ContainerBuilder $container
      */
     public function prepend(ContainerBuilder $container)
     {
+        $this->disableDoctrineListener($container);
+        $this->prependRabbitMq($container);
+    }
+    
+    /**
+     * Prepend configuration to OldSoundRabbitMQBundle.
+     *
+     * @param ContainerBuilder $container
+     */
+    private function prependRabbitMq(ContainerBuilder $container) {
         $configs = $container->getExtensionConfig($this->getAlias());
         $currentConfig = $this->processConfiguration(new Configuration($this->getAlias()), $configs);
 
@@ -135,5 +148,24 @@ class GendoriaCommandQueueRabbitMqDriverExtension extends Extension implements P
         }
 
         $container->prependExtensionConfig('old_sound_rabbit_mq', $rabbitMQConfig);
+    }
+    
+    /**
+     * Disable clear entity managers listener, if no doctrine bundle is installed.
+     * 
+     * @param ContainerBuilder $container
+     * @return void
+     */
+    private function disableDoctrineListener(ContainerBuilder $container)
+    {
+        if (!$container->hasParameter('kernel.bundles')) {
+            return;
+        }
+        $bundles = $container->getParameter('kernel.bundles');
+        if (!isset($bundles['DoctrineBundle'])) {
+            $container->prependExtensionConfig($this->getAlias(), array(
+                'clear_entity_managers_listener_enabled' => false,
+            ));
+        }
     }
 }
