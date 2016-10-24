@@ -2,12 +2,19 @@
 
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\Tests\DependencyInjection;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Gendoria\CommandQueue\ProcessorFactory\ProcessorFactoryInterface;
 use Gendoria\CommandQueueBundle\DependencyInjection\Pass\WorkerRunnersPass;
-use Gendoria\CommandQueueBundle\DependencyInjection\Pass\WorkersPass;
+use Gendoria\CommandQueueBundle\Serializer\SymfonySerializer;
 use Gendoria\CommandQueueRabbitMqDriverBundle\DependencyInjection\GendoriaCommandQueueRabbitMqDriverExtension;
+use Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorkerRunner;
+use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use PHPUnit_Framework_TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Description of GendoriaCommandQueueRabbitMqDriverExtension
@@ -33,6 +40,15 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
                 ),
             ),
         );
+        
+        $container->set('logger', new NullLogger());
+        $container->set('doctrine', $this->getMockBuilder(EntityManagerInterface::class)->getMock());
+        $container->set('gendoria_command_queue.serializer.symfony', $this->getMockBuilder(SymfonySerializer::class)->disableOriginalConstructor()->getMock());
+        $container->set('old_sound_rabbit_mq.default_producer', $this->getMockBuilder(ProducerInterface::class)->getMock());
+        $container->set('old_sound_rabbit_mq.default_reschedule_delayed_producer', $this->getMockBuilder(ProducerInterface::class)->getMock());
+        $container->set('event_dispatcher', $this->getMockBuilder(EventDispatcherInterface::class)->getMock());
+        $container->set('gendoria_command_queue.processor_factory', $this->getMockBuilder(ProcessorFactoryInterface::class)->geTMock());
+        
         $extension->load(array($config), $container);
         $this->assertFalse($container->hasDefinition('gendoria_command_queue_rabbit_mq_driver.send_driver'));
         $this->assertFalse($container->hasDefinition('gendoria_command_queue_rabbit_mq_driver.external_data_worker'));
@@ -45,8 +61,8 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
         $this->assertEquals(new Reference('gendoria_command_queue.serializer.symfony'), $defaultWorker->getArgument(2));
         $this->assertEquals(new Reference('old_sound_rabbit_mq.default_reschedule_delayed_producer'), $defaultWorker->getArgument(3));
 
-        $workerRunner = $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.worker_runner');
-        $this->assertTrue($workerRunner->hasTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
+        $workerRunnerDefinition = $container->getDefinition('gendoria_command_queue_rabbit_mq_driver.worker_runner');
+        $this->assertTrue($workerRunnerDefinition->hasTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
         $expectedTags = array(
             array(
                 'name' => 'rmq.default',
@@ -57,8 +73,14 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
                 'options' => json_encode(array_merge($config['drivers']['default'], array('reschedule' => true)))
             ),
         );
-        $this->assertEquals($expectedTags, $workerRunner->getTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
+        $this->assertEquals($expectedTags, $workerRunnerDefinition->getTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
         $this->assertTrue($container->has('gendoria_command_queue_rabbit_mq_driver.listener.clear_entity_managers'));
+        
+        //Checks after compilation
+        $container->compile();
+        /* @var $workerRunner RabbitMqWorkerRunner */
+        $workerRunner = $container->get('gendoria_command_queue_rabbit_mq_driver.worker_runner');
+        $this->assertInstanceOf(ContainerInterface::class, $workerRunner->getContainer(), 'Container has to be set in runner service.');
     }
 
     public function testPrepend()

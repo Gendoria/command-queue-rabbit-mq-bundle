@@ -17,6 +17,8 @@ services:
             
     gendoria_command_queue_rabbit_mq_driver.worker_runner:
         class: Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorkerRunner
+        calls:
+            - [setContainer, ['@service_container']]
     
     gendoria_command_queue_rabbit_mq_driver.listener.clear_logs:
         class: Gendoria\CommandQueueRabbitMqDriverBundle\Listener\ClearLogsListener

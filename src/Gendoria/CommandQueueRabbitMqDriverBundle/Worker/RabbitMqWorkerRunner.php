@@ -2,13 +2,14 @@
 
 namespace Gendoria\CommandQueueRabbitMqDriverBundle\Worker;
 
-use Gendoria\CommandQueueBundle\Worker\WorkerRunnerInterface;
+use Gendoria\CommandQueue\Worker\WorkerRunnerInterface;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Description of RabbitMqWorkerRunner
@@ -18,9 +19,36 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RabbitMqWorkerRunner implements WorkerRunnerInterface
 {
     /**
+     * Container.
+     * 
+     * @var ContainerInterface
+     */
+    private $container;
+    
+    /**
+     * Set container.
+     * 
+     * @param ContainerInterface $container
+     */
+    function setContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+    
+    /**
+     * Get container.
+     * 
+     * @return ContainerInterface|null
+     */
+    function getContainer()
+    {
+        return $this->container;
+    }
+    
+    /**
      * {@inheritdoc}
      */
-    public function run(array $options, ContainerInterface $container, OutputInterface $output = null)
+    public function run(array $options, OutputInterface $output = null)
     {
         if (empty($options['consumer_name'])) {
             throw new InvalidArgumentException("Options array has to contain consumer_name.");
@@ -28,7 +56,8 @@ class RabbitMqWorkerRunner implements WorkerRunnerInterface
         if (!$output) {
             $output = new NullOutput();
         }
-        $kernel = $container->get('kernel');
+        /* @var $kernel HttpKernelInterface */
+        $kernel = $this->container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
         $input = new ArrayInput(array(

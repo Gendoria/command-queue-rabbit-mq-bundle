@@ -49,7 +49,8 @@ class RabbitMqWorkerRunnerTest extends BaseTestClass
             }))
             ->will($this->returnValue(null));
         $worker = new RabbitMqWorkerRunner();
-        $worker->run(array('consumer_name' => 'consumer',), $container);
+        $worker->setContainer($container);
+        $worker->run(array('consumer_name' => 'consumer',));
     }
     
     public function testRunReschedule()
@@ -84,17 +85,17 @@ class RabbitMqWorkerRunnerTest extends BaseTestClass
             }))
             ->will($this->returnValue(null));
         $worker = new RabbitMqWorkerRunner();
-        $worker->run(array('consumer_name' => 'consumer', 'reschedule' => true), $container);
+        $worker->setContainer($container);
+        $worker->run(array('consumer_name' => 'consumer', 'reschedule' => true));
     }
     
     
     public function testRunNoParametersException()
     {
         $this->setExpectedException(InvalidArgumentException::class, 'Options array has to contain consumer_name.');
-        $container = new ContainerBuilder();
         
         $worker = new RabbitMqWorkerRunner();
-        $worker->run(array(), $container);
+        $worker->run(array());
     }
     
 }
