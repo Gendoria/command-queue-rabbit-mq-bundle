@@ -30,7 +30,7 @@ class RabbitMqWorkerRunner implements WorkerRunnerInterface
      * 
      * @param ContainerInterface $container
      */
-    function setContainer(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container)
     {
         $this->container = $container;
     }
@@ -40,7 +40,7 @@ class RabbitMqWorkerRunner implements WorkerRunnerInterface
      * 
      * @return ContainerInterface|null
      */
-    function getContainer()
+    public function getContainer()
     {
         return $this->container;
     }
@@ -56,7 +56,7 @@ class RabbitMqWorkerRunner implements WorkerRunnerInterface
         if (!$output) {
             $output = new NullOutput();
         }
-        /* @var $kernel HttpKernelInterface */
+        /* @var $kernel \Symfony\Component\HttpKernel\KernelInterface */
         $kernel = $this->container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
