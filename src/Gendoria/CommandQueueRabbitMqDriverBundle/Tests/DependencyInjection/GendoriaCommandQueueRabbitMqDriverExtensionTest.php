@@ -74,7 +74,6 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
             ),
         );
         $this->assertEquals($expectedTags, $workerRunnerDefinition->getTag(WorkerRunnersPass::WORKER_RUNNER_TAG));
-        $this->assertTrue($container->has('gendoria_command_queue_rabbit_mq_driver.listener.clear_entity_managers'));
         
         //Checks after compilation
         $container->compile();
@@ -164,29 +163,4 @@ class GendoriaCommandQueueRabbitMqDriverExtensionTest extends PHPUnit_Framework_
             ),
             ), $rabbitMqConfig[0]['producers']['default_reschedule_delayed']);
     }
-
-    public function testPrependNoDoctrine()
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.bundles', array());
-        $extension = new GendoriaCommandQueueRabbitMqDriverExtension();
-        $config = array(
-            'serializer' => '@gendoria_command_queue.serializer.symfony',
-            'drivers' => array(
-                'default' => array(
-                    'rabbitmq_connection' => 'default',
-                    'exchange_name' => 'default',
-                    'consumer_name' => 'default',
-                    'consumer_queue_name' => 'queue_default',
-                    'producer_name' => 'default',
-                ),
-            ),
-        );
-        $container->prependExtensionConfig('gendoria_command_queue_rabbit_mq_driver', $config);
-        $extension->prepend($container);
-        $parsedConfig = $container->getExtensionConfig($extension->getAlias());
-        $extension->load($parsedConfig, $container);
-        $this->assertFalse($container->has('gendoria_command_queue_rabbit_mq_driver.listener.clear_entity_managers'));
-    }
-
 }

@@ -19,17 +19,3 @@ services:
         class: Gendoria\CommandQueueRabbitMqDriverBundle\Worker\RabbitMqWorkerRunner
         calls:
             - [setContainer, ['@service_container']]
-    
-    gendoria_command_queue_rabbit_mq_driver.listener.clear_logs:
-        class: Gendoria\CommandQueueRabbitMqDriverBundle\Listener\ClearLogsListener
-        arguments:
-            - '@logger'
-        tags:
-            - { name: kernel.event_subscriber }
-            
-    gendoria_command_queue_rabbit_mq_driver.listener.clear_entity_managers:
-        class: Gendoria\CommandQueueRabbitMqDriverBundle\Listener\ClearEntityManagersListener
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: kernel.event_subscriber }
