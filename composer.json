@@ -24,7 +24,7 @@
         "symfony/yaml": "~2.7|~3.0",
         "symfony/monolog-bundle": "~2.4",        
         "gendoria/command-queue": "~0.2.0",
-        "gendoria/command-queue-bundle": "dev-master",
+        "gendoria/command-queue-bundle": "~0.2.0",
         "php-amqplib/rabbitmq-bundle": "~1.6"
     },
     "require-dev": {
