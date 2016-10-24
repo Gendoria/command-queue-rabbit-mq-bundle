@@ -142,15 +142,15 @@ To start receiving commands for your pool, you have to start one rabbitmq bundle
 The command to do that is:
 
 ```console
-$ app/console rabbitmq:consumer -w worker-name
+$ app/console cmq:worker:run rmq.poolname
 ```
 
-where `worker-name` is the name you defined in key `consumer_name` of your driver configuration.
+Where `poolname` is the pool name you defined in `pools` section of configuration.
 
 For the configuration from step 3, it will look like that:
 
 ```console
-$ app/console rabbitmq:consumer -w poolname_command_queue_worker
+$ app/console cmq:worker:run poolname
 ```
 
 You should use services like [supervisord](http://supervisord.org/) to control running and restarting your workers.
